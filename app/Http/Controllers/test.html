@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>API INTERGRATION</h1>
+
+    <script>
+        fetch('127.0.0.1:8000/welcome')
+        .then(res=>res.json())
+        .then(data=>console.log(data))
+    </script>
+
+</body>
+</html>
+
+
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\message;
+use Illuminate\Http\Request;
+
+class MessageController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        $message = Message::all();
+
+        return response()->json($message,200);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        //route to redirect to store method
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name'=>'required',
+            'content'=>'required',
+            'date'=>'nullable',
+            'user_id'=>'required',
+            'receiver'=>'required'
+        ]);
+
+        $message = Message::create([
+            'name'=>$request->name,
+            'content'=>$request->content,
+            'date'=>$request->date,
+            'user_id'=>$request->user_id,
+            'receiver'=>$request->receiver,
+        ]);
+        
+        if($message->save()){
+            $data = ['data'=>$message,'result'=>'Inserted successfully'];
+
+            return response()->json($data,200);
+        }
+
+        return response()->json(['data'=>'An error occured'],500);
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\message  $message
+     * @return \Illuminate\Http\Response
+     */
+    public function show(message $message)
+    {
+        $message = Message::find($message);
+
+        return response()->json($message,200);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Models\message  $message
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(message $message)
+    {
+        
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\message  $message
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        $message = Message::find($id);
+        $message->name = $request->name;
+        $message->content = $request->content;
+        $message->date = $request->date;
+        $message->user_id = $request->user_id;
+        $message->receiver = $request->receiver;
+
+        if($message->save()){
+            return response()->json($message,201);
+        }else{
+            return response()->json(['error'=>'An error occured'],206);
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\message  $message
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(message $message)
+    {
+        //
+    }
+}
